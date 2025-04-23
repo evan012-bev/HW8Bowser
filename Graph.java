@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   YOUR NAME / SECTION NUMBER
+ *   Evan Bowser / 002
  *
  *   Note, additional comments provided throughout this source code
  *   is for educational purposes
@@ -102,9 +102,28 @@ public class Graph {
    * 
    */
   
-  public int findRoot() {
-
-    // ADD YOUR CODE HERE - DO NOT FORGET TO ADD YOUR NAME/SECTION AT TOP OF FILE
-    return -1;
-  } 
+   public int findRoot() {
+    // Track vertices with incoming edges
+    boolean[] hasIncoming = new boolean[numVertices];
+    
+    // Mark vertices with incoming edges
+    for (int src = 0; src < numVertices; src++) {
+      for (int dest : adjListArr[src]) {
+        hasIncoming[dest] = true;
+      }
+    }
+    
+    // Find the root (vertex with no incoming edges)
+    int root = -1;
+    for (int i = 0; i < numVertices; i++) {
+      if (!hasIncoming[i]) {
+        // If we already found a root, return -1 (multiple roots)
+        if (root != -1) return -1;
+        root = i;
+      }
+    }
+    
+    // Return root value or -1 if no root found
+    return root == -1 ? -1 : vertexValues.get(root);
+  }
 }
