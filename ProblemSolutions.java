@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   ADD YOUR NAME / SECTION NUMBER HERE
+ *   Evan Bowser / 002
  *
  *   This java file contains the problem solutions of canFinish and
  *   numGroups methods.
@@ -72,18 +72,52 @@ class ProblemSolutions {
      * @return boolean          - True if all exams can be taken, else false.
      */
 
-    public boolean canFinish(int numExams, 
-                             int[][] prerequisites) {
-      
+     public boolean canFinish(int numExams, int[][] prerequisites) {
         int numNodes = numExams;  // # of nodes in graph
-
         // Build directed graph's adjacency list
-        ArrayList<Integer>[] adj = getAdjList(numExams, 
-                                        prerequisites); 
-
+        ArrayList<Integer>[] adj = getAdjList(numExams, prerequisites);
+        
         // ADD YOUR CODE HERE - ADD YOUR NAME / SECTION AT TOP OF FILE
-        return false;
-
+        // Track node states: 0=unvisited, 1=visiting, 2=visited
+        int[] states = new int[numNodes];
+        
+        // Check for cycles in the graph
+        for (int i = 0; i < numNodes; i++) {
+            if (states[i] == 0) {
+                // Use a stack for DFS
+                Stack<Integer> stack = new Stack<>();
+                stack.push(i);
+                states[i] = 1; // Mark as visiting
+                
+                while (!stack.isEmpty()) {
+                    int current = stack.peek();
+                    boolean hasUnvisitedNeighbor = false;
+                    
+                    // Check all neighbors
+                    for (int neighbor : adj[current]) {
+                        if (states[neighbor] == 1) {
+                            // Cycle detected
+                            return false;
+                        }
+                        
+                        if (states[neighbor] == 0) {
+                            // Visit unvisited neighbor
+                            states[neighbor] = 1;
+                            stack.push(neighbor);
+                            hasUnvisitedNeighbor = true;
+                            break;
+                        }
+                    }
+                    
+                    // If all neighbors are processed or none exist
+                    if (!hasUnvisitedNeighbor) {
+                        states[current] = 2; // Mark as fully visited
+                        stack.pop();
+                    }
+                }
+            }
+        }
+        return true;
     }
 
 
@@ -163,17 +197,17 @@ class ProblemSolutions {
      *   edge. So they form on large group.
      */
 
-    public int numGroups(int[][] adjMatrix) {
+     public int numGroups(int[][] adjMatrix) {
         int numNodes = adjMatrix.length;
         Map<Integer,List<Integer>> graph = new HashMap();
         int i = 0, j =0;
-
+    
         /*
          * Converting the Graph Adjacency Matrix to
          * an Adjacency List representation. This
          * sample code illustrates a technique to do so.
          */
-
+    
         for(i = 0; i < numNodes ; i++){
             for(j = 0; j < numNodes; j++){
                 if( adjMatrix[i][j] == 1 && i != j ){
@@ -181,7 +215,7 @@ class ProblemSolutions {
                     graph.putIfAbsent(i, new ArrayList());
                     // Add AdjList for node j if not there
                     graph.putIfAbsent(j, new ArrayList());
-
+    
                     // Update node i adjList to include node j
                     graph.get(i).add(j);
                     // Update node j adjList to include node i
@@ -189,10 +223,41 @@ class ProblemSolutions {
                 }
             }
         }
-
+    
         // YOUR CODE GOES HERE - you can add helper methods, you do not need
         // to put all code in this method.
-        return -1;
+        
+        // Count connected components using BFS
+        boolean[] visited = new boolean[numNodes];
+        int groups = 0;
+        
+        // Make sure all nodes are in the graph
+        for (i = 0; i < numNodes; i++) {
+            graph.putIfAbsent(i, new ArrayList<>());
+        }
+        
+        // Count connected components
+        for (i = 0; i < numNodes; i++) {
+            if (!visited[i]) {
+                groups++;
+                
+                // BFS to mark connected nodes
+                Queue<Integer> queue = new LinkedList<>();
+                queue.add(i);
+                visited[i] = true;
+                
+                while (!queue.isEmpty()) {
+                    for (int neighbor : graph.get(queue.poll())) {
+                        if (!visited[neighbor]) {
+                            visited[neighbor] = true;
+                            queue.add(neighbor);
+                        }
+                    }
+                }
+            }
+        }
+        
+        return groups;
     }
 
 }
